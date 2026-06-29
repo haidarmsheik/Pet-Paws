@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Pet & Paws admin dashboard for managing products and orders.">
+    <title>Pet Shop Admin Dashboard</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="admin-header">
+        <h1>Pet Shop Admin Dashboard</h1>
+        <p>Manage your pet shop products and orders</p>
+    </div>
+    
+    <div class="admin-container">
+        <div class="admin-sidebar">
+            <div class="sidebar-logo">
+                <h2>PetShop</h2>
+                <p>Admin Panel</p>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-tab="dashboard">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="products">
+                        <i class="fas fa-box"></i> Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="orders">
+                        <i class="fas fa-shopping-cart"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" id="admin-logout-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="admin-main">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="admin-section active">
+                <div class="section-title">
+                    <h2>Dashboard Overview</h2>
+                </div>
+                <div class="stats-container" id="stats-container">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Products</h3>
+                            <p id="total-products">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Orders</h3>
+                            <p id="total-orders">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Pending Orders</h3>
+                            <p id="pending-orders">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Revenue</h3>
+                            <p id="total-revenue">$0.00</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="charts-container" aria-label="Statistics charts">
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <h3>Orders by Status</h3>
+                            <span id="status-chart-total">0 orders</span>
+                        </div>
+                        <div class="bar-chart status-chart" id="status-chart"></div>
+                    </div>
+                    <div class="chart-panel">
+                        <div class="chart-header">
+                            <h3>Revenue Last 7 Days</h3>
+                            <span id="revenue-chart-total">$0.00</span>
+                        </div>
+                        <div class="bar-chart timeline-chart" id="revenue-chart"></div>
+                    </div>
+                </div>
+                <div class="recent-orders">
+                    <div class="section-title">
+                        <h2>Recent Orders</h2>
+                    </div>
+                    <div class="table-responsive">
+                        <table id="orders-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Total</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Items</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orders-list">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Products Section -->
+            <div id="products-section" class="admin-section">
+                <div class="products-header">
+                    <h2>Products Management</h2>
+                    <div class="products-header-actions">
+                        <button class="btn-secondary btn-outline" id="restore-defaults-btn">Restore Defaults</button>
+                        <button class="btn-primary" id="add-product-btn">Add New Product</button>
+                    </div>
+                </div>
+                
+                <div class="product-form" id="product-form-container" style="display: none;">
+                    <h3>Add New Product</h3>
+                    <form id="product-form">
+                        <div class="form-group">
+                            <label for="product-name">Product Name</label>
+                            <input type="text" id="product-name" required placeholder="Enter product name">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-price">Price ($)</label>
+                            <input type="number" id="product-price" required placeholder="Enter price" min="0.01" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-image">Image URL</label>
+                            <input type="text" id="product-image" required placeholder="Enter image URL">
+                        </div>
+                        <div class="form-group">
+                            <label for="product-description">Description</label>
+                            <textarea id="product-description" placeholder="Enter product description"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary btn-success">Save Product</button>
+                            <button type="button" class="btn-secondary btn-outline" id="cancel-product-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <table id="products-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Price</th>
+                            <th>Image</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="products-list">
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Orders Section -->
+            <div id="orders-section" class="admin-section">
+                <div class="products-header">
+                    <h2>Orders Management</h2>
+                    <button class="btn-primary" id="add-order-btn">Add New Order</button>
+                </div>
+
+                <div class="product-form" id="order-form-container" style="display: none;">
+                    <h3 id="order-form-title">Add New Order</h3>
+                    <form id="order-form">
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="order-customer-name">Customer Name *</label>
+                                <input type="text" id="order-customer-name" required placeholder="John Doe">
+                            </div>
+                            <div class="form-group">
+                                <label for="order-phone">Phone</label>
+                                <input type="text" id="order-phone" placeholder="+961 76 123 456">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="order-address">Delivery Address *</label>
+                            <input type="text" id="order-address" required placeholder="Building, Street, City">
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="order-status">Status</label>
+                                <select id="order-status">
+                                    <option value="Pending">Pending</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Paid on Delivery">Paid on Delivery</option>
+                                    <option value="Processing">Processing</option>
+                                    <option value="Shipped">Shipped</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="order-payment-method">Payment Method</label>
+                                <select id="order-payment-method">
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Crypto">Crypto</option>
+                                    <option value="Cash on Delivery">Cash on Delivery</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="order-notes">Notes</label>
+                            <textarea id="order-notes" placeholder="Delivery notes (optional)"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Items</label>
+                            <div class="order-items-header">
+                                <span>Name</span>
+                                <span>Qty</span>
+                                <span>Price ($)</span>
+                                <span></span>
+                            </div>
+                            <div id="order-items-container"></div>
+                            <button type="button" id="add-order-item-btn" class="btn-secondary btn-sm">+ Add Item</button>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="order-delivery">Delivery ($)</label>
+                                <input type="number" id="order-delivery" step="0.01" min="0" value="4.00">
+                            </div>
+                            <div class="form-group">
+                                <label for="order-total">Total ($)</label>
+                                <input type="number" id="order-total" step="0.01" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary btn-success">Save Order</button>
+                            <button type="button" class="btn-secondary btn-outline" id="cancel-order-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+
+                <table id="orders-table-full">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Items</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orders-list-full">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-footer">
+        <p>&copy; <span id="footer-year"></span> Pet Shop Admin Dashboard. All rights reserved.</p>
+    </div>
+
+    <script>
+        document.getElementById('footer-year').textContent = new Date().getFullYear();
+    </script>
+    <script src="https://kit.fontawesome.com/a2e0b4b0e8.js" crossorigin="anonymous"></script>
+    <script src="firebase-config.js"></script>
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
