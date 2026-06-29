@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Review your Pet & Paws shopping cart and proceed to checkout.">
+    <title>Shopping Cart | Pet & Paws</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="addtocart.css">
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="Home.html">
+                <img src="image/logo.png" alt="Pet & Paws Logo">
+                <span id="brand-name"><span class="pet-part">Pet &</span> <span class="paws-part">Paws</span></span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="Home.html">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Home.html#featured">Shop</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="blog.html">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="Home.html#about-us">About Us</a>
+                    </li>
+                </ul>
+                <div class="navbar-icons ms-lg-3 mt-3 mt-lg-0">
+                    <i class="fas fa-search"></i>
+                    <i class="fas fa-shopping-bag" onclick="window.location.href='addTocart.html'">
+                        <span id="cart-count">0</span>
+                    </i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Cart Wrapper -->
+    <div class="cart-wrapper">
+        <h1 class="cart-page-title">Shopping Cart</h1>
+        <p class="cart-page-subtitle">Review your items and proceed to checkout</p>
+
+        <div class="cart-layout">
+            <!-- Cart Items Section -->
+            <div class="cart-items-section">
+                <div class="cart-items" id="cart-items-container">
+                    <!-- Cart items will be loaded here dynamically -->
+                </div>
+            </div>
+
+            <!-- Cart Summary Sidebar -->
+            <div class="cart-summary">
+                <h3 class="summary-title">Order Summary</h3>
+                
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal</span>
+                    <span class="summary-value" id="cart-subtotal">$0.00</span>
+                </div>
+
+                <div class="summary-row">
+                    <span class="summary-label">Delivery</span>
+                    <span class="summary-value" id="cart-delivery">$4.00</span>
+                </div>
+
+                <div class="summary-total">
+                    <div class="summary-row" style="border: none;">
+                        <span class="summary-label">Total</span>
+                        <span class="summary-value" id="cart-total">$0.00</span>
+                    </div>
+                </div>
+
+                <button id="checkout-btn">
+                    <i class="fas fa-lock me-2"></i>Proceed to Checkout
+                </button>
+                
+                <button class="continue-shopping-btn" onclick="window.location.href='Home.html'">
+                    <i class="fas fa-arrow-left me-2"></i>Continue Shopping
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script src="cart.js"></script>
+    <script src="addTocart.js"></script>
+</body>
+</html>
