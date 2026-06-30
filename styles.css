@@ -2252,16 +2252,100 @@ footer .contact-item div p {
     font-weight: 600;
 }
 
-@media (max-width: 768px) {
-    .admin-dashboard {
-        padding: 60px 0;
-    }
-    
-    .admin-dashboard h2 {
-        font-size: 1.8rem;
-    }
-    
-    .admin-dashboard .table-responsive {
-        margin-bottom: 20px;
+/* Account Dropdown Styles */
+.account-dropdown {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    padding: 8px;
+}
+
+.account-dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: white;
+    min-width: 220px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+    border-radius: 12px;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.08);
+}
+
+.account-dropdown-menu.show {
+    display: block;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.account-dropdown-menu .dropdown-header {
+    padding: 15px 16px;
+    background: linear-gradient(135deg, #ff7f50, #ff956d);
+    color: white;
+}
+
+.account-dropdown-menu .dropdown-greeting {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.9;
+}
+
+.account-dropdown-menu .dropdown-email {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+.account-dropdown-menu .dropdown-divider {
+    height: 1px;
+    background: #eee;
+    margin: 0;
+}
+
+.account-dropdown-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    color: #333;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: background 0.15s;
+}
+
+.account-dropdown-menu .dropdown-item i {
+    width: 20px;
+    text-align: center;
+    color: #ff7f50;
+}
+
+.account-dropdown-menu .dropdown-item:hover {
+    background: #fff5f0;
+    color: #ff7f50;
+}
+
+.navbar-icons .fa-user {
+    font-size: 1.3rem;
+    color: #555;
+    transition: color 0.2s;
+}
+
+.navbar-icons .fa-user:hover {
+    color: #ff7f50;
+}
+
+@media (max-width: 992px) {
+    .account-dropdown-menu {
+        position: static;
+        box-shadow: none;
+        border: 1px solid #eee;
+        margin-top: 5px;
     }
 }

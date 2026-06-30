@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
             breed: "Labrador",
             age: "4 years",
             gender: "Female",
-            image: "https://images.unsplash.com/photo-1591769225440-811ad7d6eca6?w=400&h=400&fit=crop",
+            image: "https://images.unsplash.com/photo-1596492784531-6e6eb5ea9993?w=400&h=400&fit=crop",
             description: "Gentle Labrador who loves swimming and long walks.",
             badge: "Gentle",
             urgent: false
@@ -138,92 +138,70 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentFilter = 'all';
     let currentPetFilter = 'all';
 
-    // Create Product Card
     function createProductCard(product) {
         const col = document.createElement('div');
         col.className = 'col-lg-3 col-md-4 col-sm-6 product-item';
         col.dataset.category = product.category;
-
         const card = document.createElement('div');
         card.className = 'product';
-
         const imageWrapper = document.createElement('div');
         imageWrapper.className = 'product-image-wrapper';
-
         const img = document.createElement('img');
         img.src = product.image || PLACEHOLDER_IMAGE;
         img.alt = product.name;
         imageWrapper.appendChild(img);
-
         const actions = document.createElement('div');
         actions.className = 'product-actions';
-
         const cartBtn = document.createElement('button');
         cartBtn.className = 'product-action-btn cart';
         cartBtn.title = 'Add to Cart';
         cartBtn.innerHTML = '<i class="fas fa-shopping-cart"></i>';
         cartBtn.addEventListener('click', () => addToCart(product.id));
-
         const viewBtn = document.createElement('button');
         viewBtn.className = 'product-action-btn view';
         viewBtn.title = 'Quick View';
         viewBtn.innerHTML = '<i class="fas fa-eye"></i>';
         viewBtn.addEventListener('click', () => quickView(product.id));
-
         actions.appendChild(cartBtn);
         actions.appendChild(viewBtn);
         imageWrapper.appendChild(actions);
-
         const info = document.createElement('div');
         info.className = 'product-info';
-
         const name = document.createElement('h5');
         name.className = 'product-name';
         name.textContent = product.name;
-
         const price = document.createElement('div');
         price.className = 'product-price';
         price.textContent = `$${Number(product.price || 0).toFixed(2)}`;
-
         info.appendChild(name);
         info.appendChild(price);
-
         card.appendChild(imageWrapper);
         card.appendChild(info);
         col.appendChild(card);
-
         return col;
     }
 
-    // Create Pet Card
     function createPetCard(pet) {
         const col = document.createElement('div');
         col.className = 'col-lg-3 col-md-4 col-sm-6 pet-item';
         col.dataset.type = pet.type;
-
         const card = document.createElement('div');
         card.className = 'pet-card';
-
         const imageWrapper = document.createElement('div');
         imageWrapper.className = 'pet-image-wrapper';
-
         const img = document.createElement('img');
         img.src = pet.image;
         img.alt = pet.name;
         imageWrapper.appendChild(img);
-
         const badge = document.createElement('span');
         badge.className = `pet-badge ${pet.urgent ? 'urgent' : ''}`;
         badge.textContent = pet.urgent ? 'Urgent' : pet.badge;
         imageWrapper.appendChild(badge);
-
         const info = document.createElement('div');
         info.className = 'pet-info';
-
         const name = document.createElement('h5');
         name.className = 'pet-name';
         name.textContent = pet.name;
-
         const meta = document.createElement('div');
         meta.className = 'pet-meta';
         meta.innerHTML = `
@@ -231,37 +209,29 @@ document.addEventListener('DOMContentLoaded', function () {
             <span><i class="fas fa-birthday-cake"></i> ${pet.age}</span>
             <span><i class="fas fa-venus-mars"></i> ${pet.gender}</span>
         `;
-
         const description = document.createElement('p');
         description.className = 'pet-description';
         description.textContent = pet.description;
-
         const adoptBtn = document.createElement('button');
         adoptBtn.className = 'btn-adopt';
         adoptBtn.innerHTML = '<i class="fas fa-heart me-2"></i>Adopt Me';
         adoptBtn.addEventListener('click', () => openAdoptionModal(pet));
-
         info.appendChild(name);
         info.appendChild(meta);
         info.appendChild(description);
         info.appendChild(adoptBtn);
-
         card.appendChild(imageWrapper);
         card.appendChild(info);
         col.appendChild(card);
-
         return col;
     }
 
-    // Generate Product Cards
     function generateProductCards() {
         if (!productContainer) return;
         productContainer.innerHTML = '';
-
         const filteredProducts = currentFilter === 'all' 
             ? products 
             : products.filter(p => p.category === currentFilter);
-
         if (filteredProducts.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'col-12 text-center py-5';
@@ -269,21 +239,17 @@ document.addEventListener('DOMContentLoaded', function () {
             productContainer.appendChild(empty);
             return;
         }
-
         filteredProducts.forEach(product => {
             productContainer.appendChild(createProductCard(product));
         });
     }
 
-    // Generate Pet Cards
     function generatePetCards() {
         if (!petsContainer) return;
         petsContainer.innerHTML = '';
-
         const filteredPets = currentPetFilter === 'all' 
             ? adoptablePets 
             : adoptablePets.filter(p => p.type === currentPetFilter);
-
         if (filteredPets.length === 0) {
             const empty = document.createElement('div');
             empty.className = 'col-12 text-center py-5';
@@ -291,13 +257,11 @@ document.addEventListener('DOMContentLoaded', function () {
             petsContainer.appendChild(empty);
             return;
         }
-
         filteredPets.forEach(pet => {
             petsContainer.appendChild(createPetCard(pet));
         });
     }
 
-    // Product Filter Functionality
     function initProductFilters() {
         const filterBtns = document.querySelectorAll('.filter-btn');
         filterBtns.forEach(btn => {
@@ -310,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Pet Filter Functionality
     function initPetFilters() {
         const petTabs = document.querySelectorAll('.pet-tab');
         petTabs.forEach(tab => {
@@ -323,7 +286,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Add to Cart
     function addToCart(productId) {
         const product = products.find(p => String(p.id) === String(productId));
         if (!product) return;
@@ -332,30 +294,25 @@ document.addEventListener('DOMContentLoaded', function () {
         showNotification(`Added ${product.name} to cart!`, 'success');
     }
 
-    // Quick View
     function quickView(productId) {
         const product = products.find(p => String(p.id) === String(productId));
         if (product) showQuickViewModal(product);
     }
 
-    // Show Quick View Modal
     function showQuickViewModal(product) {
         const modal = document.getElementById('quickViewModal');
         if (!modal) return;
-
         const modalImg = document.getElementById('quick-view-image');
         const modalTitle = document.getElementById('quick-view-title');
         const modalPrice = document.getElementById('quick-view-price');
         const modalDesc = document.getElementById('quick-view-description');
         const quantityInput = document.getElementById('quick-view-quantity');
-
         modalImg.src = product.image || PLACEHOLDER_IMAGE;
         modalImg.alt = product.name;
         modalTitle.textContent = product.name;
         modalPrice.textContent = `$${Number(product.price || 0).toFixed(2)}`;
         modalDesc.textContent = product.description || `High-quality ${product.name} for your beloved pet. Perfect for daily use!`;
         quantityInput.value = 1;
-
         const addToCartBtn = document.getElementById('quick-view-add-to-cart');
         addToCartBtn.onclick = function () {
             const quantity = parseInt(quantityInput.value) || 1;
@@ -366,11 +323,9 @@ document.addEventListener('DOMContentLoaded', function () {
             showNotification(`Added ${quantity} x ${product.name} to cart!`, 'success');
             bootstrap.Modal.getInstance(modal).hide();
         };
-
         new bootstrap.Modal(modal).show();
     }
 
-    // Open Booking Modal
     window.openBookingModal = function(serviceType) {
         const modal = document.getElementById('bookingModal');
         const serviceInput = document.getElementById('booking-service');
@@ -380,36 +335,24 @@ document.addEventListener('DOMContentLoaded', function () {
         new bootstrap.Modal(modal).show();
     };
 
-    // Submit Booking
     window.submitBooking = function(event) {
         event.preventDefault();
-        const form = event.target;
-        const formData = new FormData(form);
-        
-        // Simulate booking submission
         showNotification('Appointment booked successfully! We will contact you shortly.', 'success');
-        
-        // Close modal
         const modal = document.getElementById('bookingModal');
         bootstrap.Modal.getInstance(modal).hide();
-        
-        // Reset form
-        form.reset();
+        event.target.reset();
     };
 
-    // Call Emergency
     window.callEmergency = function() {
         if (confirm('Call Emergency Vet Line: +961 76 836 173?')) {
             window.location.href = 'tel:+96176836173';
         }
     };
 
-    // Open Adoption Modal
     window.openAdoptionModal = function(pet) {
         const modal = document.getElementById('adoptionModal');
         const petImage = document.getElementById('adoption-pet-image');
         const petInfo = document.getElementById('adoption-pet-info');
-        
         if (petImage) petImage.src = pet.image;
         if (petInfo) {
             petInfo.innerHTML = `
@@ -420,55 +363,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p class="mb-0"><strong>Description:</strong> ${pet.description}</p>
             `;
         }
-        
         new bootstrap.Modal(modal).show();
     };
 
-    // Submit Adoption
     window.submitAdoption = function(event) {
         event.preventDefault();
-        const form = event.target;
-        
-        // Simulate adoption submission
         showNotification('Adoption application submitted! We will review and contact you soon.', 'success');
-        
-        // Close modal
         const modal = document.getElementById('adoptionModal');
         bootstrap.Modal.getInstance(modal).hide();
-        
-        // Reset form
-        form.reset();
+        event.target.reset();
     };
 
-    // Submit Contact Form
     window.submitContactForm = function(event) {
         event.preventDefault();
-        const form = event.target;
-        
-        // Simulate form submission
         showNotification('Message sent successfully! We will get back to you soon.', 'success');
-        
-        // Reset form
-        form.reset();
+        event.target.reset();
     };
 
-    // Show Notification
     function showNotification(message, type = 'success') {
         const existing = document.querySelector('.toast-notification');
         if (existing) existing.remove();
-
         const notification = document.createElement('div');
         notification.className = 'toast-notification';
-
         const icon = document.createElement('i');
         icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-info-circle';
-
         const text = document.createElement('span');
         text.textContent = message;
-
         notification.appendChild(icon);
         notification.appendChild(text);
-
         const bgColor = type === 'success' ? '#28a745' : '#17a2b8';
         notification.style.cssText = `
             position: fixed;
@@ -485,31 +407,24 @@ document.addEventListener('DOMContentLoaded', function () {
             animation: slideIn 0.3s ease;
             border-left: 4px solid ${bgColor};
         `;
-
         icon.style.color = bgColor;
         icon.style.fontSize = '1.5rem';
-
         document.body.appendChild(notification);
-
         setTimeout(() => {
             notification.style.animation = 'slideOut 0.3s ease';
             setTimeout(() => notification.remove(), 300);
         }, 3000);
     }
 
-    // Load More Products
     window.loadMoreProducts = function() {
         showNotification('Loading more products...', 'info');
-        // Simulate loading more products
         setTimeout(() => {
             showNotification('All products loaded!', 'success');
         }, 1000);
     };
 
-    // Load Products from Firebase
     function loadProducts() {
         if (typeof firebase === 'undefined' || !firebase.database) return;
-
         firebase.database().ref('products').on('value', function (snapshot) {
             const data = snapshot.val();
             if (data && Object.keys(data).length > 0) {
@@ -528,18 +443,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Update Cart Count
     function updateCartCount() {
         if (!cartCountElement) return;
         cartCountElement.textContent = window.CartManager.getItemCount();
     }
 
-    // Scroll Functions
     window.scrollToSection = function (id) {
         const el = document.getElementById(id);
         if (el) {
             el.scrollIntoView({ behavior: 'smooth' });
-            // Update active nav link
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.classList.remove('active');
                 if (link.getAttribute('href') === '#' + id) {
@@ -566,6 +478,14 @@ document.addEventListener('DOMContentLoaded', function () {
         window.location.href = 'index.html';
     };
 
+    window.goToProfile = function () {
+        window.location.href = 'Home.html#about-us';
+    };
+
+    window.goToOrders = function () {
+        window.location.href = 'addTocart.html';
+    };
+
     window.subscribeNewsletter = function (event) {
         event.preventDefault();
         showNotification('Thank you for subscribing to our newsletter!', 'success');
@@ -584,37 +504,70 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
-    // Initialize
+    function initAccountDropdown() {
+        const toggle = document.getElementById('account-toggle');
+        const menu = document.getElementById('account-dropdown-menu');
+        if (!toggle || !menu) return;
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menu.classList.toggle('show');
+        });
+        document.addEventListener('click', function() {
+            menu.classList.remove('show');
+        });
+        menu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+
+    function updateDropdownAuth(user) {
+        const loginLink = document.getElementById('dropdown-login-link');
+        const logoutLink = document.getElementById('dropdown-logout-link');
+        const adminLink = document.getElementById('dropdown-admin-link');
+        const dropdownEmail = document.getElementById('dropdown-email');
+        if (!dropdownEmail) return;
+        if (user) {
+            dropdownEmail.textContent = user.email;
+            if (loginLink) loginLink.style.display = 'none';
+            if (logoutLink) logoutLink.style.display = '';
+            if (adminLink) adminLink.style.display = (user.email === window.ADMIN_EMAIL) ? '' : 'none';
+        } else {
+            dropdownEmail.textContent = 'Sign in to your account';
+            if (loginLink) loginLink.style.display = '';
+            if (logoutLink) logoutLink.style.display = 'none';
+            if (adminLink) adminLink.style.display = 'none';
+        }
+        const adminNav = document.getElementById('admin-nav-item');
+        const logoutNav = document.getElementById('logout-nav-item');
+        if (user) {
+            if (logoutNav) logoutNav.style.display = '';
+            if (adminNav) adminNav.style.display = (user.email === window.ADMIN_EMAIL) ? '' : 'none';
+        } else {
+            if (logoutNav) logoutNav.style.display = 'none';
+            if (adminNav) adminNav.style.display = 'none';
+        }
+    }
+
     generateProductCards();
     generatePetCards();
     initProductFilters();
     initPetFilters();
     updateCartCount();
+    initAccountDropdown();
 
-    // Load from Firebase
     if (typeof firebase !== 'undefined' && firebase.database) {
         loadProducts();
     } else {
         setTimeout(loadProducts, 200);
     }
 
-    // Auth State Changed
     if (typeof firebase !== 'undefined' && firebase.auth) {
         firebase.auth().onAuthStateChanged(function (user) {
             updateCartCount();
-            const adminNav = document.getElementById('admin-nav-item');
-            const logoutNav = document.getElementById('logout-nav-item');
-            if (user) {
-                if (logoutNav) logoutNav.style.display = '';
-                if (adminNav) adminNav.style.display = (user.email === window.ADMIN_EMAIL) ? '' : 'none';
-            } else {
-                if (logoutNav) logoutNav.style.display = 'none';
-                if (adminNav) adminNav.style.display = 'none';
-            }
+            updateDropdownAuth(user);
         });
     }
 
-    // Scroll Event for Navbar and Scroll-to-Top
     window.addEventListener('scroll', function () {
         const navbar = document.querySelector('.navbar');
         const scrollTop = document.getElementById('scroll-top');
@@ -622,20 +575,16 @@ document.addEventListener('DOMContentLoaded', function () {
         if (scrollTop) scrollTop.classList.toggle('visible', window.scrollY > 100);
     });
 
-    // Search Functionality
     const searchInput = document.getElementById('search-input');
     if (searchInput) {
         searchInput.addEventListener('input', function (e) {
             const term = e.target.value.toLowerCase();
             const searchResults = document.getElementById('search-results');
-            
             if (term.length < 2) {
                 if (searchResults) searchResults.innerHTML = '';
                 return;
             }
-
             const filtered = products.filter(p => p.name.toLowerCase().includes(term));
-            
             if (searchResults) {
                 if (filtered.length === 0) {
                     searchResults.innerHTML = '<p class="text-muted text-center">No products found</p>';
@@ -654,7 +603,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Add CSS animations
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideIn {

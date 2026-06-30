@@ -8,15 +8,18 @@ const app = initializeApp(window.FIREBASE_CONFIG);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Per-tab auth state so admin and user can be signed in on different tabs.
 setPersistence(auth, browserSessionPersistence)
   .catch((err) => console.error("Failed to set auth persistence:", err));
 
 const ordersRef = ref(database, 'orders');
 const productsRef = ref(database, 'products');
+const vetRef = ref(database, 'veterinary');
+const adoptionRef = ref(database, 'adoptions');
 
 let editingProductId = null;
 let editingOrderId = null;
+let editingVetId = null;
+let editingAdoptionId = null;
 let ordersCache = {};
 let productsCache = {};
 
@@ -45,7 +48,6 @@ function maybeAutoSeedProducts() {
     localStorage.setItem('petpaws_admin_seeded', 'true');
     return;
   }
-  // Mark seeded BEFORE pushing to avoid re-entry from the onValue cascade.
   localStorage.setItem('petpaws_admin_seeded', 'true');
   DEFAULT_PRODUCTS.forEach((p) => {
     push(productsRef, p).catch((err) => console.error('Seed error:', err));
@@ -72,16 +74,12 @@ function statusClass(status) {
 
 function createAdminProductRow(id, product) {
   const tr = document.createElement('tr');
-
   const idCell = document.createElement('td');
   idCell.textContent = id;
-
   const nameCell = document.createElement('td');
   nameCell.textContent = product.name || '';
-
   const priceCell = document.createElement('td');
   priceCell.textContent = `$${(product.price || 0).toFixed(2)}`;
-
   const imageCell = document.createElement('td');
   if (product.image) {
     const img = document.createElement('img');
@@ -92,22 +90,18 @@ function createAdminProductRow(id, product) {
   } else {
     imageCell.textContent = 'No Image';
   }
-
   const actionsCell = document.createElement('td');
   const editBtn = document.createElement('button');
   editBtn.className = 'btn-edit btn-sm';
   editBtn.textContent = 'Edit';
   editBtn.addEventListener('click', () => openProductForm(id, product));
-
   const deleteBtn = document.createElement('button');
   deleteBtn.className = 'btn-delete btn-sm';
   deleteBtn.textContent = 'Delete';
   deleteBtn.addEventListener('click', () => deleteProduct(id));
-
   actionsCell.appendChild(editBtn);
   actionsCell.appendChild(document.createTextNode(' '));
   actionsCell.appendChild(deleteBtn);
-
   tr.appendChild(idCell);
   tr.appendChild(nameCell);
   tr.appendChild(priceCell);
@@ -118,31 +112,25 @@ function createAdminProductRow(id, product) {
 
 function createAdminOrderRow(orderId, order, options = {}) {
   const { withActions = true, withLocation = true } = options;
-
   const tr = document.createElement('tr');
   const date = order.timestamp ? new Date(order.timestamp).toLocaleString() : '';
   const location = order.location || {};
   const hasMap = location.lat && location.lng;
-
   const customerCell = document.createElement('td');
   customerCell.textContent = order.customerName || '';
   tr.appendChild(customerCell);
-
   const totalCell = document.createElement('td');
   totalCell.textContent = `$${(order.total || 0).toFixed(2)}`;
   tr.appendChild(totalCell);
-
   const statusCell = document.createElement('td');
   const badge = document.createElement('span');
   badge.className = `status-badge ${statusClass(order.status)}`;
   badge.textContent = order.status || 'Pending';
   statusCell.appendChild(badge);
   tr.appendChild(statusCell);
-
   const dateCell = document.createElement('td');
   dateCell.textContent = date;
   tr.appendChild(dateCell);
-
   const itemsCell = document.createElement('td');
   const items = order.items || [];
   if (items.length === 0) {
@@ -154,7 +142,6 @@ function createAdminOrderRow(orderId, order, options = {}) {
     });
   }
   tr.appendChild(itemsCell);
-
   if (withLocation) {
     const locationCell = document.createElement('td');
     if (hasMap) {
@@ -169,25 +156,21 @@ function createAdminOrderRow(orderId, order, options = {}) {
     }
     tr.appendChild(locationCell);
   }
-
   if (withActions) {
     const actionsCell = document.createElement('td');
     const editBtn = document.createElement('button');
     editBtn.className = 'btn-edit btn-sm';
     editBtn.textContent = 'Edit';
     editBtn.addEventListener('click', () => openOrderForm(orderId, order));
-
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'btn-delete btn-sm';
     deleteBtn.textContent = 'Delete';
     deleteBtn.addEventListener('click', () => deleteOrder(orderId));
-
     actionsCell.appendChild(editBtn);
     actionsCell.appendChild(document.createTextNode(' '));
     actionsCell.appendChild(deleteBtn);
     tr.appendChild(actionsCell);
   }
-
   return tr;
 }
 
@@ -196,7 +179,6 @@ function renderOrdersInto(tableId, data, options) {
   if (!table) return;
   table.innerHTML = '';
   const ids = Object.keys(data || {});
-
   if (ids.length === 0) {
     const tr = document.createElement('tr');
     const td = document.createElement('td');
@@ -206,19 +188,15 @@ function renderOrdersInto(tableId, data, options) {
     table.appendChild(tr);
     return;
   }
-
-  ids
-    .sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0))
+  ids.sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0))
     .forEach(id => table.appendChild(createAdminOrderRow(id, data[id], options)));
 }
 
 // Product CRUD
-
 function openProductForm(id = null, product = null) {
   const form = document.getElementById('product-form');
   const container = document.getElementById('product-form-container');
   if (!form || !container) return;
-
   if (product) {
     editingProductId = id;
     document.getElementById('product-name').value = product.name || '';
@@ -229,7 +207,6 @@ function openProductForm(id = null, product = null) {
     editingProductId = null;
     form.reset();
   }
-
   container.style.display = 'block';
   container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -248,23 +225,18 @@ function submitProductForm(event) {
     image: document.getElementById('product-image').value.trim(),
     description: document.getElementById('product-description').value.trim()
   };
-
   if (!productData.name || !(productData.price > 0) || !productData.image) {
     alert('Please fill all required fields.');
     return;
   }
-
   const promise = editingProductId
     ? update(ref(database, 'products/' + editingProductId), productData)
     : push(productsRef, productData);
-
-  promise
-    .then(() => {
-      alert(editingProductId ? 'Product updated!' : 'Product added!');
-      closeProductForm();
-      document.getElementById('product-form').reset();
-    })
-    .catch(error => alert('Error: ' + error.message));
+  promise.then(() => {
+    alert(editingProductId ? 'Product updated!' : 'Product added!');
+    closeProductForm();
+    document.getElementById('product-form').reset();
+  }).catch(error => alert('Error: ' + error.message));
 }
 
 function deleteProduct(productId) {
@@ -275,12 +247,10 @@ function deleteProduct(productId) {
 }
 
 // Order CRUD
-
 function openOrderForm(id = null, order = null) {
   const container = document.getElementById('order-form-container');
   const title = document.getElementById('order-form-title');
   if (!container) return;
-
   if (order) {
     editingOrderId = id;
     title.textContent = 'Edit Order';
@@ -303,7 +273,6 @@ function openOrderForm(id = null, order = null) {
     renderOrderItems([]);
     addOrderItemRow();
   }
-
   container.style.display = 'block';
   container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
@@ -324,21 +293,18 @@ function renderOrderItems(items) {
 function buildOrderItemRow(item = {}) {
   const row = document.createElement('div');
   row.className = 'order-item-row';
-
   const nameInput = document.createElement('input');
   nameInput.type = 'text';
   nameInput.placeholder = 'Item name';
   nameInput.value = item.name || '';
   nameInput.className = 'order-item-name';
   nameInput.required = true;
-
   const qtyInput = document.createElement('input');
   qtyInput.type = 'number';
   qtyInput.min = '1';
   qtyInput.value = item.quantity || 1;
   qtyInput.className = 'order-item-qty';
   qtyInput.addEventListener('input', recalculateOrderTotal);
-
   const priceInput = document.createElement('input');
   priceInput.type = 'number';
   priceInput.min = '0';
@@ -347,17 +313,12 @@ function buildOrderItemRow(item = {}) {
   priceInput.className = 'order-item-price';
   priceInput.placeholder = '0.00';
   priceInput.addEventListener('input', recalculateOrderTotal);
-
   const removeBtn = document.createElement('button');
   removeBtn.type = 'button';
   removeBtn.className = 'btn-delete btn-sm';
-  removeBtn.textContent = '×';
+  removeBtn.textContent = '\u00d7';
   removeBtn.title = 'Remove item';
-  removeBtn.addEventListener('click', () => {
-    row.remove();
-    recalculateOrderTotal();
-  });
-
+  removeBtn.addEventListener('click', () => { row.remove(); recalculateOrderTotal(); });
   row.appendChild(nameInput);
   row.appendChild(qtyInput);
   row.appendChild(priceInput);
@@ -397,30 +358,15 @@ function collectOrderItems() {
 
 function submitOrderForm(event) {
   event.preventDefault();
-
   const customerName = document.getElementById('order-customer-name').value.trim();
   const address = document.getElementById('order-address').value.trim();
-
-  if (!customerName || !address) {
-    alert('Customer name and address are required.');
-    return;
-  }
-
+  if (!customerName || !address) { alert('Customer name and address are required.'); return; }
   const items = collectOrderItems();
-  if (items.length === 0) {
-    alert('Add at least one item.');
-    return;
-  }
-
+  if (items.length === 0) { alert('Add at least one item.'); return; }
   const total = parseFloat(document.getElementById('order-total').value) || 0;
-  if (!(total > 0)) {
-    alert('Total must be greater than 0.');
-    return;
-  }
-
+  if (!(total > 0)) { alert('Total must be greater than 0.'); return; }
   const status = document.getElementById('order-status').value;
   const paymentMethod = document.getElementById('order-payment-method').value;
-
   const baseUpdate = {
     customerName,
     phone: document.getElementById('order-phone').value.trim(),
@@ -433,25 +379,13 @@ function submitOrderForm(event) {
     items,
     total
   };
-
   if (editingOrderId) {
     update(ref(database, 'orders/' + editingOrderId), baseUpdate)
-      .then(() => {
-        alert('Order updated!');
-        closeOrderForm();
-      })
+      .then(() => { alert('Order updated!'); closeOrderForm(); })
       .catch(error => alert('Error: ' + error.message));
   } else {
-    const newOrder = {
-      ...baseUpdate,
-      userId: 'admin-created',
-      timestamp: Date.now()
-    };
-    push(ordersRef, newOrder)
-      .then(() => {
-        alert('Order added!');
-        closeOrderForm();
-      })
+    push(ordersRef, { ...baseUpdate, userId: 'admin-created', timestamp: Date.now() })
+      .then(() => { alert('Order added!'); closeOrderForm(); })
       .catch(error => alert('Error: ' + error.message));
   }
 }
@@ -463,8 +397,171 @@ function deleteOrder(orderId) {
     .catch(error => alert('Error: ' + error.message));
 }
 
-// Tabs
+// Veterinary CRUD
+function openVetForm(id = null, record = null) {
+  const container = document.getElementById('vet-form-container');
+  const title = document.getElementById('vet-form-title');
+  if (!container) return;
+  if (record) {
+    editingVetId = id;
+    title.textContent = 'Edit Vet Record';
+    document.getElementById('vet-customer-name').value = record.customerName || '';
+    document.getElementById('vet-pet-name').value = record.petName || '';
+    document.getElementById('vet-service').value = record.service || 'General Checkup';
+    document.getElementById('vet-status').value = record.status || 'Scheduled';
+    document.getElementById('vet-date').value = record.date || '';
+    document.getElementById('vet-phone').value = record.phone || '';
+    document.getElementById('vet-notes').value = record.notes || '';
+  } else {
+    editingVetId = null;
+    title.textContent = 'Add Vet Record';
+    document.getElementById('vet-form').reset();
+  }
+  container.style.display = 'block';
+  container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
+function closeVetForm() {
+  const container = document.getElementById('vet-form-container');
+  if (container) container.style.display = 'none';
+  editingVetId = null;
+}
+
+function submitVetForm(event) {
+  event.preventDefault();
+  const data = {
+    customerName: document.getElementById('vet-customer-name').value.trim(),
+    petName: document.getElementById('vet-pet-name').value.trim(),
+    service: document.getElementById('vet-service').value,
+    status: document.getElementById('vet-status').value,
+    date: document.getElementById('vet-date').value,
+    phone: document.getElementById('vet-phone').value.trim(),
+    notes: document.getElementById('vet-notes').value.trim(),
+    timestamp: Date.now()
+  };
+  if (!data.customerName || !data.petName) { alert('Customer name and pet name are required.'); return; }
+  const promise = editingVetId
+    ? update(ref(database, 'veterinary/' + editingVetId), data)
+    : push(vetRef, data);
+  promise.then(() => {
+    alert(editingVetId ? 'Vet record updated!' : 'Vet record added!');
+    closeVetForm();
+    document.getElementById('vet-form').reset();
+  }).catch(error => alert('Error: ' + error.message));
+}
+
+function deleteVetRecord(id) {
+  if (!confirm('Delete this vet record?')) return;
+  remove(ref(database, 'veterinary/' + id))
+    .then(() => alert('Vet record deleted.'))
+    .catch(error => alert('Error: ' + error.message));
+}
+
+function createVetRow(id, record) {
+  const tr = document.createElement('tr');
+  const c1 = document.createElement('td'); c1.textContent = record.customerName || '';
+  const c2 = document.createElement('td'); c2.textContent = record.petName || '';
+  const c3 = document.createElement('td'); c3.textContent = record.service || '';
+  const c4 = document.createElement('td');
+  const badge = document.createElement('span');
+  badge.className = `status-badge ${statusClass(record.status)}`;
+  badge.textContent = record.status || 'Scheduled';
+  c4.appendChild(badge);
+  const c5 = document.createElement('td'); c5.textContent = record.date || '';
+  const c6 = document.createElement('td');
+  const editBtn = document.createElement('button');
+  editBtn.className = 'btn-edit btn-sm'; editBtn.textContent = 'Edit';
+  editBtn.addEventListener('click', () => openVetForm(id, record));
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn-delete btn-sm'; delBtn.textContent = 'Delete';
+  delBtn.addEventListener('click', () => deleteVetRecord(id));
+  c6.appendChild(editBtn); c6.appendChild(document.createTextNode(' ')); c6.appendChild(delBtn);
+  tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3); tr.appendChild(c4); tr.appendChild(c5); tr.appendChild(c6);
+  return tr;
+}
+
+// Adoption CRUD
+function openAdoptionForm(id = null, record = null) {
+  const container = document.getElementById('adoption-form-container');
+  const title = document.getElementById('adoption-form-title');
+  if (!container) return;
+  if (record) {
+    editingAdoptionId = id;
+    title.textContent = 'Edit Adoption Record';
+    document.getElementById('adopt-applicant').value = record.applicant || '';
+    document.getElementById('adopt-pet-name').value = record.petName || '';
+    document.getElementById('adopt-pet-type').value = record.petType || 'dog';
+    document.getElementById('adopt-status').value = record.status || 'Pending Review';
+    document.getElementById('adopt-date').value = record.date || '';
+    document.getElementById('adopt-notes').value = record.notes || '';
+  } else {
+    editingAdoptionId = null;
+    title.textContent = 'Add Adoption Record';
+    document.getElementById('adoption-form-admin').reset();
+  }
+  container.style.display = 'block';
+  container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeAdoptionForm() {
+  const container = document.getElementById('adoption-form-container');
+  if (container) container.style.display = 'none';
+  editingAdoptionId = null;
+}
+
+function submitAdoptionForm(event) {
+  event.preventDefault();
+  const data = {
+    applicant: document.getElementById('adopt-applicant').value.trim(),
+    petName: document.getElementById('adopt-pet-name').value.trim(),
+    petType: document.getElementById('adopt-pet-type').value,
+    status: document.getElementById('adopt-status').value,
+    date: document.getElementById('adopt-date').value,
+    notes: document.getElementById('adopt-notes').value.trim(),
+    timestamp: Date.now()
+  };
+  if (!data.applicant || !data.petName) { alert('Applicant name and pet name are required.'); return; }
+  const promise = editingAdoptionId
+    ? update(ref(database, 'adoptions/' + editingAdoptionId), data)
+    : push(adoptionRef, data);
+  promise.then(() => {
+    alert(editingAdoptionId ? 'Adoption record updated!' : 'Adoption record added!');
+    closeAdoptionForm();
+    document.getElementById('adoption-form-admin').reset();
+  }).catch(error => alert('Error: ' + error.message));
+}
+
+function deleteAdoptionRecord(id) {
+  if (!confirm('Delete this adoption record?')) return;
+  remove(ref(database, 'adoptions/' + id))
+    .then(() => alert('Adoption record deleted.'))
+    .catch(error => alert('Error: ' + error.message));
+}
+
+function createAdoptionRow(id, record) {
+  const tr = document.createElement('tr');
+  const c1 = document.createElement('td'); c1.textContent = record.applicant || '';
+  const c2 = document.createElement('td'); c2.textContent = record.petName || '';
+  const c3 = document.createElement('td'); c3.textContent = record.petType || '';
+  const c4 = document.createElement('td');
+  const badge = document.createElement('span');
+  badge.className = `status-badge ${statusClass(record.status)}`;
+  badge.textContent = record.status || 'Pending Review';
+  c4.appendChild(badge);
+  const c5 = document.createElement('td'); c5.textContent = record.date || '';
+  const c6 = document.createElement('td');
+  const editBtn = document.createElement('button');
+  editBtn.className = 'btn-edit btn-sm'; editBtn.textContent = 'Edit';
+  editBtn.addEventListener('click', () => openAdoptionForm(id, record));
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn-delete btn-sm'; delBtn.textContent = 'Delete';
+  delBtn.addEventListener('click', () => deleteAdoptionRecord(id));
+  c6.appendChild(editBtn); c6.appendChild(document.createTextNode(' ')); c6.appendChild(delBtn);
+  tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3); tr.appendChild(c4); tr.appendChild(c5); tr.appendChild(c6);
+  return tr;
+}
+
+// Tabs
 function activateTab(tabName) {
   document.querySelectorAll('.nav-link[data-tab]').forEach(link => {
     link.classList.toggle('active', link.dataset.tab === tabName);
@@ -475,23 +572,19 @@ function activateTab(tabName) {
 }
 
 // Stats
-
 function updateDashboardStats() {
   const ordersArr = Object.values(ordersCache);
   const productsCount = Object.keys(productsCache).length;
   const totalRevenue = ordersArr.reduce((sum, o) => sum + getOrderTotal(o), 0);
   const pendingOrders = ordersArr.filter(o => (o.status || 'Pending') === 'Pending').length;
-
   const elTotalProducts = document.getElementById('total-products');
   const elTotalOrders = document.getElementById('total-orders');
   const elPendingOrders = document.getElementById('pending-orders');
   const elRevenue = document.getElementById('total-revenue');
-
   if (elTotalProducts) elTotalProducts.textContent = productsCount;
   if (elTotalOrders) elTotalOrders.textContent = ordersArr.length;
   if (elPendingOrders) elPendingOrders.textContent = pendingOrders;
   if (elRevenue) elRevenue.textContent = `$${totalRevenue.toFixed(2)}`;
-
   updateDashboardCharts(ordersArr);
 }
 
@@ -516,46 +609,32 @@ function renderStatusChart(ordersArr) {
   const chart = document.getElementById('status-chart');
   const totalEl = document.getElementById('status-chart-total');
   if (!chart) return;
-
   const totalOrders = ordersArr.length;
   if (totalEl) totalEl.textContent = `${totalOrders} order${totalOrders === 1 ? '' : 's'}`;
-
-  if (totalOrders === 0) {
-    setEmptyChart(chart, 'No orders yet');
-    return;
-  }
-
+  if (totalOrders === 0) { setEmptyChart(chart, 'No orders yet'); return; }
   const statusCounts = ordersArr.reduce((counts, order) => {
     const status = order.status || 'Pending';
     counts[status] = (counts[status] || 0) + 1;
     return counts;
   }, {});
-
-  const rows = Object.entries(statusCounts)
-    .sort((a, b) => b[1] - a[1]);
+  const rows = Object.entries(statusCounts).sort((a, b) => b[1] - a[1]);
   const maxCount = Math.max(...rows.map(([, count]) => count));
-
   chart.innerHTML = '';
   rows.forEach(([status, count]) => {
     const row = document.createElement('div');
     row.className = 'chart-row';
-
     const label = document.createElement('span');
     label.className = 'chart-label';
     label.textContent = status;
-
     const track = document.createElement('div');
     track.className = 'chart-track';
-
     const fill = document.createElement('div');
     fill.className = 'chart-fill';
     fill.style.setProperty('--chart-value', `${(count / maxCount) * 100}%`);
     track.appendChild(fill);
-
     const value = document.createElement('span');
     value.className = 'chart-value';
     value.textContent = count;
-
     row.appendChild(label);
     row.appendChild(track);
     row.appendChild(value);
@@ -573,15 +652,10 @@ function dateKey(date) {
 function buildLastSevenDays() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(today);
     date.setDate(today.getDate() - (6 - index));
-    return {
-      key: dateKey(date),
-      label: date.toLocaleDateString(undefined, { weekday: 'short' }),
-      revenue: 0
-    };
+    return { key: dateKey(date), label: date.toLocaleDateString(undefined, { weekday: 'short' }), revenue: 0 };
   });
 }
 
@@ -589,52 +663,35 @@ function renderRevenueChart(ordersArr) {
   const chart = document.getElementById('revenue-chart');
   const totalEl = document.getElementById('revenue-chart-total');
   if (!chart) return;
-
   const days = buildLastSevenDays();
-  const daysByKey = days.reduce((map, day) => {
-    map[day.key] = day;
-    return map;
-  }, {});
-
+  const daysByKey = days.reduce((map, day) => { map[day.key] = day; return map; }, {});
   ordersArr.forEach(order => {
     if (!order.timestamp) return;
     const orderDate = new Date(order.timestamp);
     const day = daysByKey[dateKey(orderDate)];
     if (day) day.revenue += getOrderTotal(order);
   });
-
   const totalRevenue = days.reduce((sum, day) => sum + day.revenue, 0);
   if (totalEl) totalEl.textContent = formatCurrency(totalRevenue);
-
-  if (totalRevenue === 0) {
-    setEmptyChart(chart, 'No revenue in the last 7 days');
-    return;
-  }
-
+  if (totalRevenue === 0) { setEmptyChart(chart, 'No revenue in the last 7 days'); return; }
   const maxRevenue = Math.max(...days.map(day => day.revenue));
-
   chart.innerHTML = '';
   days.forEach(day => {
     const bar = document.createElement('div');
     bar.className = 'timeline-bar';
-
     const value = document.createElement('span');
     value.className = 'timeline-value';
     value.textContent = formatCurrency(day.revenue);
-
     const wrap = document.createElement('div');
     wrap.className = 'timeline-fill-wrap';
-
     const fill = document.createElement('div');
     fill.className = 'timeline-fill';
     fill.classList.toggle('is-zero', day.revenue === 0);
     fill.style.setProperty('--chart-value', `${(day.revenue / maxRevenue) * 100}%`);
     wrap.appendChild(fill);
-
     const label = document.createElement('span');
     label.className = 'timeline-label';
     label.textContent = day.label;
-
     bar.appendChild(value);
     bar.appendChild(wrap);
     bar.appendChild(label);
@@ -648,23 +705,15 @@ function updateDashboardCharts(ordersArr = Object.values(ordersCache)) {
 }
 
 // Auth + dashboard wiring
-
 onAuthStateChanged(auth, (user) => {
-  if (!user) {
-    window.location.href = 'admin-login.html';
-    return;
-  }
-
+  if (!user) { window.location.href = 'admin-login.html'; return; }
   if (user.email !== ADMIN_EMAIL) {
     alert('Access denied. Admin privileges required.');
     sessionStorage.removeItem('adminSession');
     sessionStorage.removeItem('adminEmail');
-    signOut(auth).then(() => {
-      window.location.href = 'Home.html';
-    });
+    signOut(auth).then(() => { window.location.href = 'Home.html'; });
     return;
   }
-
   sessionStorage.setItem('adminSession', 'true');
   sessionStorage.setItem('adminEmail', user.email);
   loadDashboard();
@@ -686,37 +735,45 @@ function loadDashboard() {
       e.preventDefault();
       sessionStorage.removeItem('adminSession');
       sessionStorage.removeItem('adminEmail');
-      signOut(auth)
-        .then(() => { window.location.href = 'admin-login.html'; })
-        .catch(() => { window.location.href = 'admin-login.html'; });
+      signOut(auth).then(() => { window.location.href = 'admin-login.html'; }).catch(() => { window.location.href = 'admin-login.html'; });
     });
   }
 
   // Product form wiring
   const addProductBtn = document.getElementById('add-product-btn');
   if (addProductBtn) addProductBtn.addEventListener('click', () => openProductForm());
-
   const cancelProductBtn = document.getElementById('cancel-product-btn');
   if (cancelProductBtn) cancelProductBtn.addEventListener('click', closeProductForm);
-
   const productForm = document.getElementById('product-form');
   if (productForm) productForm.addEventListener('submit', submitProductForm);
 
   // Order form wiring
   const addOrderBtn = document.getElementById('add-order-btn');
   if (addOrderBtn) addOrderBtn.addEventListener('click', () => openOrderForm());
-
   const cancelOrderBtn = document.getElementById('cancel-order-btn');
   if (cancelOrderBtn) cancelOrderBtn.addEventListener('click', closeOrderForm);
-
   const orderForm = document.getElementById('order-form');
   if (orderForm) orderForm.addEventListener('submit', submitOrderForm);
-
   const addItemBtn = document.getElementById('add-order-item-btn');
   if (addItemBtn) addItemBtn.addEventListener('click', addOrderItemRow);
-
   const deliveryInput = document.getElementById('order-delivery');
   if (deliveryInput) deliveryInput.addEventListener('input', recalculateOrderTotal);
+
+  // Vet form wiring
+  const addVetBtn = document.getElementById('add-vet-btn');
+  if (addVetBtn) addVetBtn.addEventListener('click', () => openVetForm());
+  const cancelVetBtn = document.getElementById('cancel-vet-btn');
+  if (cancelVetBtn) cancelVetBtn.addEventListener('click', closeVetForm);
+  const vetForm = document.getElementById('vet-form');
+  if (vetForm) vetForm.addEventListener('submit', submitVetForm);
+
+  // Adoption form wiring
+  const addAdoptionBtn = document.getElementById('add-adoption-btn');
+  if (addAdoptionBtn) addAdoptionBtn.addEventListener('click', () => openAdoptionForm());
+  const cancelAdoptionBtn = document.getElementById('cancel-adoption-btn');
+  if (cancelAdoptionBtn) cancelAdoptionBtn.addEventListener('click', closeAdoptionForm);
+  const adoptionForm = document.getElementById('adoption-form-admin');
+  if (adoptionForm) adoptionForm.addEventListener('submit', submitAdoptionForm);
 
   // Firebase listeners
   onValue(productsRef, (snapshot) => {
@@ -748,6 +805,46 @@ function loadDashboard() {
     renderOrdersInto('orders-list', ordersCache, { withActions: false, withLocation: false });
     renderOrdersInto('orders-list-full', ordersCache, { withActions: true, withLocation: true });
     updateDashboardStats();
+  });
+
+  // Vet listener
+  onValue(vetRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const table = document.getElementById('vet-list');
+    if (!table) return;
+    table.innerHTML = '';
+    const ids = Object.keys(data);
+    if (ids.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 6;
+      td.textContent = 'No vet records';
+      tr.appendChild(td);
+      table.appendChild(tr);
+    } else {
+      ids.sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0))
+        .forEach(id => table.appendChild(createVetRow(id, data[id])));
+    }
+  });
+
+  // Adoption listener
+  onValue(adoptionRef, (snapshot) => {
+    const data = snapshot.val() || {};
+    const table = document.getElementById('adoption-list');
+    if (!table) return;
+    table.innerHTML = '';
+    const ids = Object.keys(data);
+    if (ids.length === 0) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = 6;
+      td.textContent = 'No adoption records';
+      tr.appendChild(td);
+      table.appendChild(tr);
+    } else {
+      ids.sort((a, b) => (data[b].timestamp || 0) - (data[a].timestamp || 0))
+        .forEach(id => table.appendChild(createAdoptionRow(id, data[id])));
+    }
   });
 }
 

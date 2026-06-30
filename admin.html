@@ -36,6 +36,16 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="veterinary">
+                        <i class="fas fa-user-md"></i> Vet Clinic
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-tab="adoption">
+                        <i class="fas fa-home"></i> Adoption
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link" id="admin-logout-link">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
@@ -158,6 +168,150 @@
                 </table>
             </div>
             
+            <!-- Veterinary Clinic Section -->
+            <div id="veterinary-section" class="admin-section">
+                <div class="products-header">
+                    <h2>Veterinary Clinic Management</h2>
+                    <button class="btn-primary" id="add-vet-btn">Add Vet Record</button>
+                </div>
+                <div class="product-form" id="vet-form-container" style="display: none;">
+                    <h3 id="vet-form-title">Add Vet Record</h3>
+                    <form id="vet-form">
+                        <div class="form-group">
+                            <label for="vet-customer-name">Customer Name *</label>
+                            <input type="text" id="vet-customer-name" required placeholder="Customer name">
+                        </div>
+                        <div class="form-group">
+                            <label for="vet-pet-name">Pet Name *</label>
+                            <input type="text" id="vet-pet-name" required placeholder="Pet name">
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="vet-service">Service Type</label>
+                                <select id="vet-service">
+                                    <option value="General Checkup">General Checkup</option>
+                                    <option value="Vaccination">Vaccination</option>
+                                    <option value="Grooming">Grooming</option>
+                                    <option value="Dental Care">Dental Care</option>
+                                    <option value="Lab Tests">Lab Tests</option>
+                                    <option value="Emergency">Emergency</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="vet-status">Status</label>
+                                <select id="vet-status">
+                                    <option value="Scheduled">Scheduled</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="No Show">No Show</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="vet-date">Date</label>
+                                <input type="date" id="vet-date">
+                            </div>
+                            <div class="form-group">
+                                <label for="vet-phone">Phone</label>
+                                <input type="text" id="vet-phone" placeholder="+961 76 123 456">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="vet-notes">Notes</label>
+                            <textarea id="vet-notes" placeholder="Vet notes / diagnosis"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary btn-success">Save Record</button>
+                            <button type="button" class="btn-secondary btn-outline" id="cancel-vet-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <table id="vet-table">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Pet</th>
+                            <th>Service</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="vet-list">
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Adoption Section -->
+            <div id="adoption-section" class="admin-section">
+                <div class="products-header">
+                    <h2>Adoption Management</h2>
+                    <button class="btn-primary" id="add-adoption-btn">Add Adoption Record</button>
+                </div>
+                <div class="product-form" id="adoption-form-container" style="display: none;">
+                    <h3 id="adoption-form-title">Add Adoption Record</h3>
+                    <form id="adoption-form-admin">
+                        <div class="form-group">
+                            <label for="adopt-applicant">Applicant Name *</label>
+                            <input type="text" id="adopt-applicant" required placeholder="Applicant name">
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="adopt-pet-name">Pet Name *</label>
+                                <input type="text" id="adopt-pet-name" required placeholder="Pet name">
+                            </div>
+                            <div class="form-group">
+                                <label for="adopt-pet-type">Pet Type</label>
+                                <select id="adopt-pet-type">
+                                    <option value="dog">Dog</option>
+                                    <option value="cat">Cat</option>
+                                    <option value="bird">Bird</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group">
+                                <label for="adopt-status">Status</label>
+                                <select id="adopt-status">
+                                    <option value="Pending Review">Pending Review</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Adopted">Adopted</option>
+                                    <option value="Rejected">Rejected</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="adopt-date">Application Date</label>
+                                <input type="date" id="adopt-date">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="adopt-notes">Notes</label>
+                            <textarea id="adopt-notes" placeholder="Additional notes about the adoption"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary btn-success">Save Record</button>
+                            <button type="button" class="btn-secondary btn-outline" id="cancel-adoption-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                <table id="adoption-table">
+                    <thead>
+                        <tr>
+                            <th>Applicant</th>
+                            <th>Pet Name</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adoption-list">
+                    </tbody>
+                </table>
+            </div>
+
             <!-- Orders Section -->
             <div id="orders-section" class="admin-section">
                 <div class="products-header">

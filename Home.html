@@ -64,7 +64,35 @@
                     <i class="fas fa-shopping-bag" onclick="goToCart()" title="Cart">
                         <span id="cart-count">0</span>
                     </i>
-                    <i class="fas fa-user" onclick="goToLogin()" title="Account"></i>
+                    <div class="account-dropdown">
+                        <i class="fas fa-user" id="account-toggle" title="Account"></i>
+                        <div class="account-dropdown-menu" id="account-dropdown-menu">
+                            <div class="dropdown-header" id="dropdown-user-info">
+                                <span class="dropdown-greeting">Welcome!</span>
+                                <span class="dropdown-email" id="dropdown-email">Sign in to your account</span>
+                            </div>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); goToProfile();">
+                                <i class="fas fa-user-circle"></i> My Profile
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); goToCart();">
+                                <i class="fas fa-shopping-bag"></i> My Cart
+                            </a>
+                            <a class="dropdown-item" href="#" onclick="event.preventDefault(); goToOrders();">
+                                <i class="fas fa-box"></i> My Orders
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" id="dropdown-admin-link" href="admin.html" style="display:none;">
+                                <i class="fas fa-shield-alt"></i> Admin Dashboard
+                            </a>
+                            <a class="dropdown-item" id="dropdown-login-link" href="index.html">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </a>
+                            <a class="dropdown-item" id="dropdown-logout-link" href="#" onclick="event.preventDefault(); logoutUser();" style="display:none;">
+                                <i class="fas fa-sign-out-alt"></i> Sign Out
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -95,7 +123,7 @@
                             <span class="stat-label">Happy Pets</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">500+</span>
+                            <span class="stat-number">50+</span>
                             <span class="stat-label">Products</span>
                         </div>
                         <div class="stat-item">
@@ -286,11 +314,12 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="vet-card">
                             <div class="vet-image">
-                                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=400&h=400&fit=crop" alt="Dr. Sarah Johnson">
+                                <img src="https://images.unsplash.com/photo-1559839734-2b71ea197ec2?w=400&h=400&fit=crop" alt="Dr. Omar Khoury">
                             </div>
-                            <h5>Dr. Sarah Johnson</h5>
-                            <span class="vet-role">Chief Veterinarian</span>
-                            <p>15+ years experience in small animal medicine</p>
+                            <h5>د. عمر خوري</h5>
+                            <h5>Dr. Omar Khoury</h5>
+                            <span class="vet-role">طبيب بيطري رئيسي - Chief Veterinarian</span>
+                            <p>خبرة 18 عاماً في الطب البيطري - 18+ years experience</p>
                             <div class="vet-rating">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
@@ -304,11 +333,12 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="vet-card">
                             <div class="vet-image">
-                                <img src="https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=400&fit=crop" alt="Dr. Michael Chen">
+                                <img src="https://images.unsplash.com/photo-1537368910025-700350fe46c7?w=400&h=400&fit=crop" alt="Dr. Layal Mansour">
                             </div>
-                            <h5>Dr. Michael Chen</h5>
-                            <span class="vet-role">Surgical Specialist</span>
-                            <p>Expert in orthopedic and soft tissue surgery</p>
+                            <h5>د. ليال منصور</h5>
+                            <h5>Dr. Layal Mansour</h5>
+                            <span class="vet-role">اختصاصية جراحة - Surgical Specialist</span>
+                            <p>خبيرة في جراحة العظام والأنسجة - Orthopedic surgery expert</p>
                             <div class="vet-rating">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
@@ -322,11 +352,12 @@
                     <div class="col-lg-4 col-md-6">
                         <div class="vet-card">
                             <div class="vet-image">
-                                <img src="https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=400&fit=crop" alt="Dr. Emily Rodriguez">
+                                <img src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=400&fit=crop" alt="Dr. Hassan Jaber">
                             </div>
-                            <h5>Dr. Emily Rodriguez</h5>
-                            <span class="vet-role">Pet Nutritionist</span>
-                            <p>Specialized in dietary planning and nutrition</p>
+                            <h5>د. حسن جابر</h5>
+                            <h5>Dr. Hassan Jaber</h5>
+                            <span class="vet-role">اختصاصي تغذية الحيوانات - Pet Nutritionist</span>
+                            <p>متخصص في التغذية العلاجية والتخطيط الغذائي للحيوانات الأليفة</p>
                             <div class="vet-rating">
                                 <i class="fas fa-star"></i>
                                 <i class="fas fa-star"></i>
